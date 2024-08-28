@@ -20,17 +20,19 @@ describe("Add clients", () => {
       .should("exist") // Wait for the element to exist in the DOM
       .and("be.visible")
       .type("4500");
-    cy.xpath("/html/body/div/div/div/div/div[3]/div[3]/form/div[4]/input")
-      .should("be.visible")
-      .type("4000");
-    cy.xpath(
-      "/html/body/div/div/div/div/div[3]/div[3]/form/div[2]/select"
-    ).click();
-    cy.xpath(
-      "/html/body/div/div/div/div/div[3]/div[3]/form/div[2]/select/option[3]"
-    ).click();
-    // cy.xpath(
-    //   "/html/body/div/div/div/div/div[3]/div[3]/form/div[9]/button"
-    // ).click();
+    cy.get("#status").select("Pending");
+    cy.get("#type").select("Salary Loan");
+    cy.get("#terms").select("2 Months");
+    //   cy.get("button.text-center").click();
+
+    cy.intercept({
+      method: "PATCH",
+      url: "http://localhost:8000/loans/2",
+    }).as("updateLoan");
+    cy.get("button.text-center").click();
+
+    cy.wait("@updateLoan").then((data) => {
+      expect(data.response.statusCode, "Response Status Code").to.equal(200);
+    });
   });
 });
